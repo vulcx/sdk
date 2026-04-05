@@ -11,7 +11,7 @@ npm install @argyros/sdk
 Or via CDN:
 
 ```html
-<script src="https://cdn.argyros.trade/sdk.umd.js"></script>
+<script src="https://unpkg.com/@argyros/sdk"></script>
 ```
 
 ## Quick Start
