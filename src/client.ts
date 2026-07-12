@@ -9,7 +9,7 @@ import type {
   InstructionsResponse,
 } from "./types";
 import {
-  ArgyrosError,
+  VulcxError,
   RateLimitError,
   NoRouteError,
   BadRequestError,
@@ -17,11 +17,11 @@ import {
   ServerError,
 } from "./errors";
 
-const DEFAULT_BASE_URL = "https://api.argyros.xyz";
+const DEFAULT_BASE_URL = "https://api.vulcx.xyz";
 const DEFAULT_TIMEOUT = 30_000;
 const DEFAULT_RETRIES = 2;
 
-export class ArgyrosSDK {
+export class VulcxSDK {
   private readonly apiKey: string;
   private readonly chain: Chain;
   private readonly baseUrl: string;
@@ -124,14 +124,14 @@ export class ArgyrosSDK {
               lastError = new ServerError(errMsg, errBody);
               continue;
             }
-            throw new ArgyrosError(errMsg, res.status, errBody);
+            throw new VulcxError(errMsg, res.status, errBody);
         }
       } catch (err) {
         if (
           err instanceof AuthError ||
           err instanceof BadRequestError ||
           err instanceof NoRouteError ||
-          err instanceof ArgyrosError
+          err instanceof VulcxError
         ) {
           throw err;
         }

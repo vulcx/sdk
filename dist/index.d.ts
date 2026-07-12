@@ -65,11 +65,11 @@ interface SwapResponse {
     maxAmountIn?: string;
     feeAmount: string;
     simulation?: SimulationResult;
-    computeUnitsEstimate?: number;
+    computeUnitsEstimate: number;
     route: string[];
     hopCount: number;
     pools: string[];
-    isSplitRoute?: boolean;
+    isSplitRoute: boolean;
     splitPercents?: number[];
 }
 interface InstructionsRequest {
@@ -102,7 +102,7 @@ interface InstructionsResponse {
     pools: string[];
 }
 
-declare class ArgyrosSDK {
+declare class VulcxSDK {
     private readonly apiKey;
     private readonly chain;
     private readonly baseUrl;
@@ -115,26 +115,26 @@ declare class ArgyrosSDK {
     private request;
 }
 
-declare class ArgyrosError extends Error {
+declare class VulcxError extends Error {
     readonly statusCode: number;
     readonly body?: unknown | undefined;
     constructor(message: string, statusCode: number, body?: unknown | undefined);
 }
-declare class RateLimitError extends ArgyrosError {
+declare class RateLimitError extends VulcxError {
     constructor(body?: unknown);
 }
-declare class NoRouteError extends ArgyrosError {
+declare class NoRouteError extends VulcxError {
     constructor(body?: unknown);
 }
-declare class BadRequestError extends ArgyrosError {
+declare class BadRequestError extends VulcxError {
     constructor(message: string, body?: unknown);
 }
-declare class AuthError extends ArgyrosError {
+declare class AuthError extends VulcxError {
     constructor(body?: unknown);
 }
-declare class ServerError extends ArgyrosError {
+declare class ServerError extends VulcxError {
     constructor(message: string, body?: unknown);
 }
 
-export { ArgyrosError, ArgyrosSDK, AuthError, BadRequestError, NoRouteError, RateLimitError, ServerError };
+export { AuthError, BadRequestError, NoRouteError, RateLimitError, ServerError, VulcxError, VulcxSDK };
 export type { Chain, InstructionsRequest, InstructionsResponse, PriceImpactSeverity, QuoteRequest, QuoteResponse, RawAccountMeta, RawInstruction, RouteInfo, SDKConfig, SimulationResult, SwapMode, SwapRequest, SwapResponse };

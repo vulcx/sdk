@@ -1,4 +1,4 @@
-export { ArgyrosSDK } from "./client";
+export { VulcxSDK } from "./client";
 export type {
   SDKConfig,
   Chain,
@@ -16,7 +16,7 @@ export type {
   RawAccountMeta,
 } from "./types";
 export {
-  ArgyrosError,
+  VulcxError,
   RateLimitError,
   NoRouteError,
   BadRequestError,

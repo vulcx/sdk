@@ -1,7 +1,7 @@
 {
-  "name": "@argyros/sdk",
-  "version": "0.1.0",
-  "description": "TypeScript SDK for the Argyros DEX aggregator API",
+  "name": "@vulcx/sdk",
+  "version": "0.2.0",
+  "description": "TypeScript SDK for the Vulcx DEX aggregator API",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "browser": "dist/index.umd.js",
@@ -41,6 +41,6 @@
     "aggregator",
     "swap",
     "fogo",
-    "argyros"
+    "vulcx"
   ]
 }

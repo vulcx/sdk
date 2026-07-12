@@ -1,31 +1,31 @@
-# @argyros/sdk
+# @vulcx/sdk
 
-TypeScript SDK for the Argyros DEX aggregator API. Works in Node.js, browsers, and any JavaScript runtime with `fetch`.
+TypeScript SDK for the Vulcx DEX aggregator API. Works in Node.js, browsers, and any JavaScript runtime with `fetch`.
 
 ## Install
 
 ```bash
-npm install @argyros/sdk
+npm install @vulcx/sdk
 ```
 
 Or via CDN:
 
 ```html
-<script src="https://unpkg.com/@argyros/sdk"></script>
+<script src="https://unpkg.com/@vulcx/sdk"></script>
 ```
 
 ## Quick Start
 
 ```typescript
-import { ArgyrosSDK } from "@argyros/sdk";
+import { VulcxSDK } from "@vulcx/sdk";
 
-const argyros = new ArgyrosSDK({
-  apiKey: "argy_your_api_key_here",
+const vulcx = new VulcxSDK({
+  apiKey: "vulcx_your_api_key_here",
   chain: "solana", // or "fogo"
 });
 
 // Get a quote
-const quote = await argyros.quote({
+const quote = await vulcx.quote({
   inputMint: "So11111111111111111111111111111111111111112",
   outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
   amount: "1000000000", // 1 SOL in lamports
@@ -38,20 +38,20 @@ console.log(`Output: ${quote.amountOut}, Impact: ${quote.priceImpactPercent}`);
 
 ## API
 
-### `new ArgyrosSDK(config)`
+### `new VulcxSDK(config)`
 
 | Parameter   | Type     | Default                       | Description                |
 | ----------- | -------- | ----------------------------- | -------------------------- |
 | `apiKey`    | `string` | **required**                  | Your API key               |
 | `chain`     | `string` | `"solana"`                    | `"solana"` or `"fogo"`     |
-| `baseUrl`   | `string` | `"https://api.argyros.xyz"` | API base URL               |
+| `baseUrl`   | `string` | `"https://api.vulcx.xyz"` | API base URL               |
 | `timeout`   | `number` | `30000`                       | Request timeout in ms      |
 | `retries`   | `number` | `2`                           | Retry count for 429/5xx    |
 
 ### `sdk.quote(params): Promise<QuoteResponse>`
 
 ```typescript
-const quote = await argyros.quote({
+const quote = await vulcx.quote({
   inputMint: "So111...",
   outputMint: "EPjFW...",
   amount: "1000000000",
@@ -65,7 +65,7 @@ const quote = await argyros.quote({
 Returns a base64-encoded unsigned transaction.
 
 ```typescript
-const swap = await argyros.swap({
+const swap = await vulcx.swap({
   userWallet: "9WzDX...",
   inputMint: "So111...",
   outputMint: "EPjFW...",
@@ -83,7 +83,7 @@ const swap = await argyros.swap({
 Returns raw instructions for composability.
 
 ```typescript
-const ixs = await argyros.instructions({
+const ixs = await vulcx.instructions({
   userWallet: "9WzDX...",
   inputMint: "So111...",
   outputMint: "EPjFW...",
@@ -97,10 +97,10 @@ const ixs = await argyros.instructions({
 ## Error Handling
 
 ```typescript
-import { ArgyrosSDK, NoRouteError, RateLimitError, AuthError } from "@argyros/sdk";
+import { VulcxSDK, NoRouteError, RateLimitError, AuthError } from "@vulcx/sdk";
 
 try {
-  const quote = await argyros.quote({ ... });
+  const quote = await vulcx.quote({ ... });
 } catch (err) {
   if (err instanceof NoRouteError) {
     console.log("No route found between tokens");
@@ -117,10 +117,10 @@ try {
 ### React
 
 ```tsx
-import { ArgyrosSDK } from "@argyros/sdk";
+import { VulcxSDK } from "@vulcx/sdk";
 import { useEffect, useState } from "react";
 
-const sdk = new ArgyrosSDK({ apiKey: "argy_..." });
+const sdk = new VulcxSDK({ apiKey: "vulcx_..." });
 
 function SwapPage() {
   const [quote, setQuote] = useState(null);
@@ -141,8 +141,8 @@ function SwapPage() {
 ### Node.js
 
 ```javascript
-const { ArgyrosSDK } = require("@argyros/sdk");
+const { VulcxSDK } = require("@vulcx/sdk");
 
-const sdk = new ArgyrosSDK({ apiKey: process.env.ARGYROS_API_KEY });
+const sdk = new VulcxSDK({ apiKey: process.env.VULCX_KEY });
 const quote = await sdk.quote({ ... });
 ```

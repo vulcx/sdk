@@ -1,52 +1,52 @@
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.ArgyrosSDK = {}));
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.VulcxSDK = {}));
 })(this, (function (exports) { 'use strict';
 
-    class ArgyrosError extends Error {
+    class VulcxError extends Error {
         constructor(message, statusCode, body) {
             super(message);
             this.statusCode = statusCode;
             this.body = body;
-            this.name = "ArgyrosError";
+            this.name = "VulcxError";
         }
     }
-    class RateLimitError extends ArgyrosError {
+    class RateLimitError extends VulcxError {
         constructor(body) {
             super("Rate limit exceeded", 429, body);
             this.name = "RateLimitError";
         }
     }
-    class NoRouteError extends ArgyrosError {
+    class NoRouteError extends VulcxError {
         constructor(body) {
             super("No route found", 404, body);
             this.name = "NoRouteError";
         }
     }
-    class BadRequestError extends ArgyrosError {
+    class BadRequestError extends VulcxError {
         constructor(message, body) {
             super(message, 400, body);
             this.name = "BadRequestError";
         }
     }
-    class AuthError extends ArgyrosError {
+    class AuthError extends VulcxError {
         constructor(body) {
             super("Invalid or missing API key", 401, body);
             this.name = "AuthError";
         }
     }
-    class ServerError extends ArgyrosError {
+    class ServerError extends VulcxError {
         constructor(message, body) {
             super(message, 500, body);
             this.name = "ServerError";
         }
     }
 
-    const DEFAULT_BASE_URL = "https://api.argyros.xyz";
+    const DEFAULT_BASE_URL = "https://api.vulcx.xyz";
     const DEFAULT_TIMEOUT = 30000;
     const DEFAULT_RETRIES = 2;
-    class ArgyrosSDK {
+    class VulcxSDK {
         constructor(config) {
             if (!config.apiKey)
                 throw new Error("apiKey is required");
@@ -120,14 +120,14 @@
                                 lastError = new ServerError(errMsg, errBody);
                                 continue;
                             }
-                            throw new ArgyrosError(errMsg, res.status, errBody);
+                            throw new VulcxError(errMsg, res.status, errBody);
                     }
                 }
                 catch (err) {
                     if (err instanceof AuthError ||
                         err instanceof BadRequestError ||
                         err instanceof NoRouteError ||
-                        err instanceof ArgyrosError) {
+                        err instanceof VulcxError) {
                         throw err;
                     }
                     lastError = err;
@@ -140,13 +140,13 @@
         return new Promise((r) => setTimeout(r, ms));
     }
 
-    exports.ArgyrosError = ArgyrosError;
-    exports.ArgyrosSDK = ArgyrosSDK;
     exports.AuthError = AuthError;
     exports.BadRequestError = BadRequestError;
     exports.NoRouteError = NoRouteError;
     exports.RateLimitError = RateLimitError;
     exports.ServerError = ServerError;
+    exports.VulcxError = VulcxError;
+    exports.VulcxSDK = VulcxSDK;
 
 }));
 //# sourceMappingURL=index.umd.js.map
