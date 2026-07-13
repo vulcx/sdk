@@ -1,9 +1,7 @@
 type SwapMode = "ExactIn" | "ExactOut";
-type Chain = "solana" | "fogo";
 type PriceImpactSeverity = "none" | "low" | "moderate" | "high" | "extreme";
 interface SDKConfig {
     apiKey: string;
-    chain?: Chain;
     baseUrl?: string;
     timeout?: number;
     retries?: number;
@@ -104,7 +102,6 @@ interface InstructionsResponse {
 
 declare class VulcxSDK {
     private readonly apiKey;
-    private readonly chain;
     private readonly baseUrl;
     private readonly timeout;
     private readonly retries;
@@ -137,4 +134,4 @@ declare class ServerError extends VulcxError {
 }
 
 export { AuthError, BadRequestError, NoRouteError, RateLimitError, ServerError, VulcxError, VulcxSDK };
-export type { Chain, InstructionsRequest, InstructionsResponse, PriceImpactSeverity, QuoteRequest, QuoteResponse, RawAccountMeta, RawInstruction, RouteInfo, SDKConfig, SimulationResult, SwapMode, SwapRequest, SwapResponse };
+export type { InstructionsRequest, InstructionsResponse, PriceImpactSeverity, QuoteRequest, QuoteResponse, RawAccountMeta, RawInstruction, RouteInfo, SDKConfig, SimulationResult, SwapMode, SwapRequest, SwapResponse };

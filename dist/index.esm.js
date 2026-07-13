@@ -45,7 +45,6 @@ class VulcxSDK {
         if (!config.apiKey)
             throw new Error("apiKey is required");
         this.apiKey = config.apiKey;
-        this.chain = config.chain ?? "solana";
         this.baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, "");
         this.timeout = config.timeout ?? DEFAULT_TIMEOUT;
         this.retries = config.retries ?? DEFAULT_RETRIES;
@@ -69,8 +68,7 @@ class VulcxSDK {
         return this.request("POST", "/api/v1/instructions", params);
     }
     async request(method, path, body) {
-        const separator = path.includes("?") ? "&" : "?";
-        const url = `${this.baseUrl}${path}${separator}chain=${this.chain}`;
+        const url = `${this.baseUrl}${path}`;
         const headers = {
             Authorization: `Bearer ${this.apiKey}`,
             Accept: "application/json",

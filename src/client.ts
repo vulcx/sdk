@@ -1,6 +1,5 @@
 import type {
   SDKConfig,
-  Chain,
   QuoteRequest,
   QuoteResponse,
   SwapRequest,
@@ -23,7 +22,6 @@ const DEFAULT_RETRIES = 2;
 
 export class VulcxSDK {
   private readonly apiKey: string;
-  private readonly chain: Chain;
   private readonly baseUrl: string;
   private readonly timeout: number;
   private readonly retries: number;
@@ -31,7 +29,6 @@ export class VulcxSDK {
   constructor(config: SDKConfig) {
     if (!config.apiKey) throw new Error("apiKey is required");
     this.apiKey = config.apiKey;
-    this.chain = config.chain ?? "solana";
     this.baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, "");
     this.timeout = config.timeout ?? DEFAULT_TIMEOUT;
     this.retries = config.retries ?? DEFAULT_RETRIES;
@@ -69,8 +66,7 @@ export class VulcxSDK {
     path: string,
     body?: unknown
   ): Promise<T> {
-    const separator = path.includes("?") ? "&" : "?";
-    const url = `${this.baseUrl}${path}${separator}chain=${this.chain}`;
+    const url = `${this.baseUrl}${path}`;
 
     const headers: Record<string, string> = {
       Authorization: `Bearer ${this.apiKey}`,

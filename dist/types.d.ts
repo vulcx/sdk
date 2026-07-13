@@ -1,9 +1,7 @@
 export type SwapMode = "ExactIn" | "ExactOut";
-export type Chain = "solana" | "fogo";
 export type PriceImpactSeverity = "none" | "low" | "moderate" | "high" | "extreme";
 export interface SDKConfig {
     apiKey: string;
-    chain?: Chain;
     baseUrl?: string;
     timeout?: number;
     retries?: number;

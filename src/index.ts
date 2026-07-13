@@ -1,7 +1,6 @@
 export { VulcxSDK } from "./client";
 export type {
   SDKConfig,
-  Chain,
   SwapMode,
   PriceImpactSeverity,
   QuoteRequest,
