@@ -96,7 +96,16 @@ class VulcxSDK {
                 });
                 clearTimeout(timer);
                 if (res.ok) {
-                    return (await res.json());
+                    const parsed = (await res.json());
+                    // API responses wrap the payload in {success, data}; hand back the
+                    // payload the way the method signatures promise.
+                    if (parsed && typeof parsed === "object" && "success" in parsed) {
+                        if (!parsed.success) {
+                            throw new VulcxError(parsed.error ?? "request failed", res.status, parsed);
+                        }
+                        return parsed.data;
+                    }
+                    return parsed;
                 }
                 const errBody = await res.json().catch(() => ({}));
                 const errMsg = errBody?.error ?? res.statusText;
