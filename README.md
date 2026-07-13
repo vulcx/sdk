@@ -11,7 +11,7 @@ npm install @vulcx/sdk
 Or via CDN:
 
 ```html
-<script src="https://unpkg.com/@vulcx/sdk"></script>
+<script src="https://unpkg.com/@vulcx/sdk/dist/index.umd.js"></script>
 ```
 
 ## Quick Start
@@ -21,14 +21,13 @@ import { VulcxSDK } from "@vulcx/sdk";
 
 const vulcx = new VulcxSDK({
   apiKey: "vulcx_your_api_key_here",
-  chain: "solana", // or "fogo"
 });
 
 // Get a quote
 const quote = await vulcx.quote({
   inputMint: "So11111111111111111111111111111111111111112",
-  outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-  amount: "1000000000", // 1 SOL in lamports
+  outputMint: "uSd2czE61Evaf76RNbq4KPpXnkiL3irdzgLFUMe3NoG",
+  amount: "1000000000", // 1 FOGO (9 decimals)
   swapMode: "ExactIn",
   slippageBps: 50,
 });
@@ -43,7 +42,6 @@ console.log(`Output: ${quote.amountOut}, Impact: ${quote.priceImpactPercent}`);
 | Parameter   | Type     | Default                       | Description                |
 | ----------- | -------- | ----------------------------- | -------------------------- |
 | `apiKey`    | `string` | **required**                  | Your API key               |
-| `chain`     | `string` | `"solana"`                    | `"solana"` or `"fogo"`     |
 | `baseUrl`   | `string` | `"https://api.vulcx.xyz"` | API base URL               |
 | `timeout`   | `number` | `30000`                       | Request timeout in ms      |
 | `retries`   | `number` | `2`                           | Retry count for 429/5xx    |
