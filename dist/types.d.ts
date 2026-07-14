@@ -43,6 +43,12 @@ export interface QuoteResponse {
     quoteId?: string;
     /** How long `quoteId` stays redeemable, in milliseconds. */
     validForMs?: number;
+    /**
+     * How long `quoteId` stays redeemable with `firm: true`, in milliseconds.
+     * Firm redemption collapses slippage to the server's firm margin around
+     * this exact price — price-or-fail.
+     */
+    firmForMs?: number;
 }
 export interface SwapRequest {
     userWallet: string;
@@ -58,6 +64,14 @@ export interface SwapRequest {
      * QuoteStaleError (409) if the quoted route vanished — re-quote and retry.
      */
     quoteId?: string;
+    /**
+     * Firm (Tier 2) redemption — requires quoteId, and only within the quote's
+     * firmForMs window. Slippage collapses to the server's firm margin around
+     * the quoted price (slippageBps is ignored); if the route drifted past that
+     * margin the request throws QuoteStaleError instead of executing at a worse
+     * price. Best paired with session-key signing — the window is sub-second.
+     */
+    firm?: boolean;
 }
 export interface SimulationResult {
     success: boolean;
@@ -94,6 +108,8 @@ export interface InstructionsRequest {
     slippageBps?: number;
     /** Optional firm-quote ID from quote() — see SwapRequest.quoteId. */
     quoteId?: string;
+    /** Firm (Tier 2) redemption — see SwapRequest.firm. */
+    firm?: boolean;
 }
 export interface RawAccountMeta {
     publicKey: string;
