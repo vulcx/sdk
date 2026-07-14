@@ -38,6 +38,20 @@ class ServerError extends VulcxError {
         this.name = "ServerError";
     }
 }
+/** The firm quote's TTL elapsed before redemption (410). Re-quote and retry. */
+class QuoteExpiredError extends VulcxError {
+    constructor(body) {
+        super("Quote expired: request a fresh quote", 410, body);
+        this.name = "QuoteExpiredError";
+    }
+}
+/** The quoted route no longer exists (409, pool removed). Re-quote and retry. */
+class QuoteStaleError extends VulcxError {
+    constructor(body) {
+        super("Quoted route is no longer available: request a fresh quote", 409, body);
+        this.name = "QuoteStaleError";
+    }
+}
 
 const DEFAULT_BASE_URL = "https://api.vulcx.xyz";
 const DEFAULT_TIMEOUT = 30000;
@@ -115,6 +129,12 @@ class VulcxSDK {
                         throw new BadRequestError(errMsg, errBody);
                     case 404:
                         throw new NoRouteError(errBody);
+                    case 409:
+                        // Firm quote's route vanished — retrying the same request can't
+                        // succeed; the caller must re-quote.
+                        throw new QuoteStaleError(errBody);
+                    case 410:
+                        throw new QuoteExpiredError(errBody);
                     case 429:
                         lastError = new RateLimitError(errBody);
                         continue;
@@ -146,6 +166,8 @@ function sleep(ms) {
 exports.AuthError = AuthError;
 exports.BadRequestError = BadRequestError;
 exports.NoRouteError = NoRouteError;
+exports.QuoteExpiredError = QuoteExpiredError;
+exports.QuoteStaleError = QuoteStaleError;
 exports.RateLimitError = RateLimitError;
 exports.ServerError = ServerError;
 exports.VulcxError = VulcxError;

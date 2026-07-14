@@ -18,3 +18,11 @@ export declare class AuthError extends VulcxError {
 export declare class ServerError extends VulcxError {
     constructor(message: string, body?: unknown);
 }
+/** The firm quote's TTL elapsed before redemption (410). Re-quote and retry. */
+export declare class QuoteExpiredError extends VulcxError {
+    constructor(body?: unknown);
+}
+/** The quoted route no longer exists (409, pool removed). Re-quote and retry. */
+export declare class QuoteStaleError extends VulcxError {
+    constructor(body?: unknown);
+}

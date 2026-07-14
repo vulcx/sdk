@@ -14,6 +14,8 @@ import {
   BadRequestError,
   AuthError,
   ServerError,
+  QuoteExpiredError,
+  QuoteStaleError,
 } from "./errors";
 
 const DEFAULT_BASE_URL = "https://api.vulcx.xyz";
@@ -125,6 +127,12 @@ export class VulcxSDK {
             throw new BadRequestError(errMsg, errBody);
           case 404:
             throw new NoRouteError(errBody);
+          case 409:
+            // Firm quote's route vanished — retrying the same request can't
+            // succeed; the caller must re-quote.
+            throw new QuoteStaleError(errBody);
+          case 410:
+            throw new QuoteExpiredError(errBody);
           case 429:
             lastError = new RateLimitError(errBody);
             continue;

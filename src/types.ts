@@ -43,6 +43,15 @@ export interface QuoteResponse {
   routePath: string[];
   hopCount: number;
   otherAmountThreshold: string;
+  /**
+   * Firm-quote commitment ID. Pass it as `quoteId` to swap() or
+   * instructions() within `validForMs` to have this exact route replayed at
+   * this price (min-out anchors to this quote, not a fresh one). Absent when
+   * the quote can't be pinned (e.g. split routes).
+   */
+  quoteId?: string;
+  /** How long `quoteId` stays redeemable, in milliseconds. */
+  validForMs?: number;
 }
 
 export interface SwapRequest {
@@ -53,6 +62,12 @@ export interface SwapRequest {
   swapMode: SwapMode;
   slippageBps?: number;
   skipSimulation?: boolean;
+  /**
+   * Optional firm-quote ID from quote(). Pair, amount, and swapMode must
+   * match the original quote. Throws QuoteExpiredError (410) past its TTL and
+   * QuoteStaleError (409) if the quoted route vanished — re-quote and retry.
+   */
+  quoteId?: string;
 }
 
 export interface SimulationResult {
@@ -90,6 +105,8 @@ export interface InstructionsRequest {
   amount: string;
   swapMode: SwapMode;
   slippageBps?: number;
+  /** Optional firm-quote ID from quote() — see SwapRequest.quoteId. */
+  quoteId?: string;
 }
 
 export interface RawAccountMeta {

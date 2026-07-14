@@ -21,4 +21,6 @@ export {
   BadRequestError,
   AuthError,
   ServerError,
+  QuoteExpiredError,
+  QuoteStaleError,
 } from "./errors";

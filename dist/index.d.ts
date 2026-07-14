@@ -34,6 +34,15 @@ interface QuoteResponse {
     routePath: string[];
     hopCount: number;
     otherAmountThreshold: string;
+    /**
+     * Firm-quote commitment ID. Pass it as `quoteId` to swap() or
+     * instructions() within `validForMs` to have this exact route replayed at
+     * this price (min-out anchors to this quote, not a fresh one). Absent when
+     * the quote can't be pinned (e.g. split routes).
+     */
+    quoteId?: string;
+    /** How long `quoteId` stays redeemable, in milliseconds. */
+    validForMs?: number;
 }
 interface SwapRequest {
     userWallet: string;
@@ -43,6 +52,12 @@ interface SwapRequest {
     swapMode: SwapMode;
     slippageBps?: number;
     skipSimulation?: boolean;
+    /**
+     * Optional firm-quote ID from quote(). Pair, amount, and swapMode must
+     * match the original quote. Throws QuoteExpiredError (410) past its TTL and
+     * QuoteStaleError (409) if the quoted route vanished — re-quote and retry.
+     */
+    quoteId?: string;
 }
 interface SimulationResult {
     success: boolean;
@@ -77,6 +92,8 @@ interface InstructionsRequest {
     amount: string;
     swapMode: SwapMode;
     slippageBps?: number;
+    /** Optional firm-quote ID from quote() — see SwapRequest.quoteId. */
+    quoteId?: string;
 }
 interface RawAccountMeta {
     publicKey: string;
@@ -132,6 +149,14 @@ declare class AuthError extends VulcxError {
 declare class ServerError extends VulcxError {
     constructor(message: string, body?: unknown);
 }
+/** The firm quote's TTL elapsed before redemption (410). Re-quote and retry. */
+declare class QuoteExpiredError extends VulcxError {
+    constructor(body?: unknown);
+}
+/** The quoted route no longer exists (409, pool removed). Re-quote and retry. */
+declare class QuoteStaleError extends VulcxError {
+    constructor(body?: unknown);
+}
 
-export { AuthError, BadRequestError, NoRouteError, RateLimitError, ServerError, VulcxError, VulcxSDK };
+export { AuthError, BadRequestError, NoRouteError, QuoteExpiredError, QuoteStaleError, RateLimitError, ServerError, VulcxError, VulcxSDK };
 export type { InstructionsRequest, InstructionsResponse, PriceImpactSeverity, QuoteRequest, QuoteResponse, RawAccountMeta, RawInstruction, RouteInfo, SDKConfig, SimulationResult, SwapMode, SwapRequest, SwapResponse };

@@ -1,6 +1,6 @@
 {
   "name": "@vulcx/sdk",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "TypeScript SDK for the Vulcx DEX aggregator API",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",

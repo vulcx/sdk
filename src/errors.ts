@@ -43,3 +43,19 @@ export class ServerError extends VulcxError {
     this.name = "ServerError";
   }
 }
+
+/** The firm quote's TTL elapsed before redemption (410). Re-quote and retry. */
+export class QuoteExpiredError extends VulcxError {
+  constructor(body?: unknown) {
+    super("Quote expired: request a fresh quote", 410, body);
+    this.name = "QuoteExpiredError";
+  }
+}
+
+/** The quoted route no longer exists (409, pool removed). Re-quote and retry. */
+export class QuoteStaleError extends VulcxError {
+  constructor(body?: unknown) {
+    super("Quoted route is no longer available: request a fresh quote", 409, body);
+    this.name = "QuoteStaleError";
+  }
+}
