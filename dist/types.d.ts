@@ -49,6 +49,15 @@ export interface QuoteResponse {
      * this exact price — price-or-fail.
      */
     firmForMs?: number;
+    /**
+     * Base58 Ed25519 signature over the canonical `vulcx-quote-v1` message —
+     * present when the server signs its quotes. Verification key at
+     * GET /.well-known/vulcx-quote-signer. Lets third parties prove what price
+     * was quoted, independent of trusting this SDK or the transport.
+     */
+    quoteSignature?: string;
+    /** Absolute expiry (unix ms) embedded in the signed message. */
+    quoteExpiresAtMs?: number;
 }
 export interface SwapRequest {
     userWallet: string;
@@ -72,6 +81,11 @@ export interface SwapRequest {
      * price. Best paired with session-key signing — the window is sub-second.
      */
     firm?: boolean;
+    /**
+     * Optional referrer wallet (base58). Earns the protocol's on-chain
+     * referral share of the swap fee, paid in the output token.
+     */
+    referrer?: string;
 }
 export interface SimulationResult {
     success: boolean;
@@ -110,6 +124,20 @@ export interface InstructionsRequest {
     quoteId?: string;
     /** Firm (Tier 2) redemption — see SwapRequest.firm. */
     firm?: boolean;
+    /**
+     * Optional referrer wallet (base58). Earns the protocol's on-chain
+     * referral share of the swap fee, paid in the output token.
+     */
+    referrer?: string;
+    /**
+     * Optional Fogo session account (base58). When set, the response contains a
+     * single session-shaped route instruction: the session account is the
+     * signing authority (userWallet's ATAs still hold the funds) and no
+     * ATA-create or SOL-wrap instructions are emitted — check the response's
+     * requiredTokenAccounts. Send it via the Fogo Sessions SDK (session key
+     * signs, paymaster pays). Session routes are currently Vortex-V1-only.
+     */
+    sessionAccount?: string;
 }
 export interface RawAccountMeta {
     publicKey: string;
@@ -131,6 +159,12 @@ export interface InstructionsResponse {
     hopCount: number;
     route: string[];
     pools: string[];
+    /**
+     * Session mode only: the user's ATAs the route touches, ordered
+     * [inputMint, ...intermediates, outputMint]. They must exist (and the input
+     * ATA hold amountIn) before the session transaction is sent.
+     */
+    requiredTokenAccounts?: string[];
 }
 export interface APIErrorBody {
     error: string;
