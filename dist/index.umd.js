@@ -61,10 +61,11 @@
     const DEFAULT_TIMEOUT = 30000;
     const DEFAULT_RETRIES = 2;
     class VulcxSDK {
-        constructor(config) {
-            if (!config.apiKey)
-                throw new Error("apiKey is required");
-            this.apiKey = config.apiKey;
+        // Config is optional in full: the API is free and keyless, so `new VulcxSDK()`
+        // is already a working client. `config.apiKey` is accepted and ignored rather
+        // than rejected, so integrations written against the old key-based API keep
+        // running untouched.
+        constructor(config = {}) {
             this.baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, "");
             this.timeout = config.timeout ?? DEFAULT_TIMEOUT;
             this.retries = config.retries ?? DEFAULT_RETRIES;
@@ -90,7 +91,6 @@
         async request(method, path, body) {
             const url = `${this.baseUrl}${path}`;
             const headers = {
-                Authorization: `Bearer ${this.apiKey}`,
                 Accept: "application/json",
             };
             if (body) {

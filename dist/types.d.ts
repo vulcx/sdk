@@ -1,7 +1,14 @@
 export type SwapMode = "ExactIn" | "ExactOut";
 export type PriceImpactSeverity = "none" | "low" | "moderate" | "high" | "extreme";
 export interface SDKConfig {
-    apiKey: string;
+    /**
+     * Ignored. The Vulcx API is free and keyless — there is no key to obtain,
+     * and none is sent. Kept so existing integrations keep compiling; omit it in
+     * new code.
+     *
+     * @deprecated The API requires no authentication.
+     */
+    apiKey?: string;
     baseUrl?: string;
     timeout?: number;
     retries?: number;

@@ -23,14 +23,15 @@ const DEFAULT_TIMEOUT = 30_000;
 const DEFAULT_RETRIES = 2;
 
 export class VulcxSDK {
-  private readonly apiKey: string;
   private readonly baseUrl: string;
   private readonly timeout: number;
   private readonly retries: number;
 
-  constructor(config: SDKConfig) {
-    if (!config.apiKey) throw new Error("apiKey is required");
-    this.apiKey = config.apiKey;
+  // Config is optional in full: the API is free and keyless, so `new VulcxSDK()`
+  // is already a working client. `config.apiKey` is accepted and ignored rather
+  // than rejected, so integrations written against the old key-based API keep
+  // running untouched.
+  constructor(config: SDKConfig = {}) {
     this.baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, "");
     this.timeout = config.timeout ?? DEFAULT_TIMEOUT;
     this.retries = config.retries ?? DEFAULT_RETRIES;
@@ -71,7 +72,6 @@ export class VulcxSDK {
     const url = `${this.baseUrl}${path}`;
 
     const headers: Record<string, string> = {
-      Authorization: `Bearer ${this.apiKey}`,
       Accept: "application/json",
     };
     if (body) {
