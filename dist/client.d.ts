@@ -1,5 +1,6 @@
 import type { SDKConfig, QuoteRequest, QuoteResponse, SwapRequest, SwapResponse, InstructionsRequest, InstructionsResponse } from "./types";
 export declare class VulcxSDK {
+    private readonly apiKey?;
     private readonly baseUrl;
     private readonly timeout;
     private readonly retries;

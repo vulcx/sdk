@@ -2,11 +2,11 @@ export type SwapMode = "ExactIn" | "ExactOut";
 export type PriceImpactSeverity = "none" | "low" | "moderate" | "high" | "extreme";
 export interface SDKConfig {
     /**
-     * Ignored. The Vulcx API is free and keyless — there is no key to obtain,
-     * and none is sent. Kept so existing integrations keep compiling; omit it in
-     * new code.
+     * Optional. Sent as `Authorization: Bearer <apiKey>` when provided.
      *
-     * @deprecated The API requires no authentication.
+     * Without one, requests are served anonymously under a small per-IP rate
+     * limit; a key raises you to the published per-key budget. The
+     * `/api/v1/stream` WebSocket always requires a key.
      */
     apiKey?: string;
     baseUrl?: string;

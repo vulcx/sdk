@@ -23,15 +23,17 @@ const DEFAULT_TIMEOUT = 30_000;
 const DEFAULT_RETRIES = 2;
 
 export class VulcxSDK {
+  private readonly apiKey?: string;
   private readonly baseUrl: string;
   private readonly timeout: number;
   private readonly retries: number;
 
-  // Config is optional in full: the API is free and keyless, so `new VulcxSDK()`
-  // is already a working client. `config.apiKey` is accepted and ignored rather
-  // than rejected, so integrations written against the old key-based API keep
-  // running untouched.
+  // A key is optional, not absent: without one the API serves you anonymously at
+  // a much smaller per-IP rate limit, so `new VulcxSDK()` works for trying things
+  // out. Pass `apiKey` for the published per-key budget -- and note the
+  // `/api/v1/stream` WebSocket requires one regardless.
   constructor(config: SDKConfig = {}) {
+    this.apiKey = config.apiKey;
     this.baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, "");
     this.timeout = config.timeout ?? DEFAULT_TIMEOUT;
     this.retries = config.retries ?? DEFAULT_RETRIES;
@@ -74,6 +76,9 @@ export class VulcxSDK {
     const headers: Record<string, string> = {
       Accept: "application/json",
     };
+    if (this.apiKey) {
+      headers.Authorization = `Bearer ${this.apiKey}`;
+    }
     if (body) {
       headers["Content-Type"] = "application/json";
     }

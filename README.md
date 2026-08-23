@@ -41,7 +41,7 @@ console.log(`Output: ${quote.amountOut}, Impact: ${quote.priceImpactPercent}`);
 
 | Parameter   | Type     | Default                       | Description                |
 | ----------- | -------- | ----------------------------- | -------------------------- |
-| `apiKey`    | `string` | **required**                  | Your API key               |
+| `apiKey`    | `string` | _optional_                    | Your API key. Omitted, requests are served anonymously at a much smaller per-IP rate limit; `/api/v1/stream` always requires one. |
 | `baseUrl`   | `string` | `"https://api.vulcx.xyz"` | API base URL               |
 | `timeout`   | `number` | `30000`                       | Request timeout in ms      |
 | `retries`   | `number` | `2`                           | Retry count for 429/5xx    |
