@@ -155,7 +155,7 @@ export interface InstructionsRequest {
    * signing authority (userWallet's ATAs still hold the funds) and no
    * ATA-create or SOL-wrap instructions are emitted — check the response's
    * requiredTokenAccounts. Send it via the Fogo Sessions SDK (session key
-   * signs, paymaster pays). Session routes are currently Vortex-V1-only.
+   * signs, paymaster pays). Session routes are currently Valiant-V1-only.
    */
   sessionAccount?: string;
 }
