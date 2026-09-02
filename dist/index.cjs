@@ -176,4 +176,4 @@ exports.RateLimitError = RateLimitError;
 exports.ServerError = ServerError;
 exports.VulcxError = VulcxError;
 exports.VulcxSDK = VulcxSDK;
-//# sourceMappingURL=index.cjs.js.map
+//# sourceMappingURL=index.cjs.map

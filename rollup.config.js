@@ -5,7 +5,10 @@ export default [
   {
     input: "src/index.ts",
     output: [
-      { file: "dist/index.cjs.js", format: "cjs", sourcemap: true },
+      // .cjs, not .cjs.js: package.json sets "type": "module", which makes Node
+      // treat every .js in the package as ESM — including this CommonJS build,
+      // so `require("@vulcx/sdk")` threw "exports is not defined".
+      { file: "dist/index.cjs", format: "cjs", sourcemap: true },
       { file: "dist/index.esm.js", format: "es", sourcemap: true },
       {
         file: "dist/index.umd.js",
