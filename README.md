@@ -104,8 +104,33 @@ const swap = await vulcx.swap({
 });
 ```
 
-Check `swap.simulation.success` before submitting — a failed simulation still comes
-back with HTTP 200 and a transaction.
+The server simulates the transaction before returning it, and a simulation that
+fails is an **error**, not a 200 you have to inspect. You get no transaction, and
+the reason is typed:
+
+```typescript
+try {
+  const swap = await vulcx.swap({ /* … */ });
+  // Reaching here means the simulation passed. Sign and submit.
+} catch (err) {
+  if (err instanceof QuoteStaleError) {
+    // 409 — the price moved between quoting and building. Re-quote and retry.
+  } else if (err instanceof BadRequestError) {
+    // 400 — insufficient funds. Retrying changes nothing.
+  } else if (err instanceof VulcxError && err.statusCode === 422) {
+    // The route cannot execute as shaped.
+  }
+}
+```
+
+The `SimulationResult` rides along on the thrown error's body at
+`data.simulation`, with `insufficientFunds` and `slippageExceeded` set — those
+two booleans are the only stable machine-readable failure signal the API
+offers, so branch on them rather than on message text.
+
+`skipSimulation: true` opts out entirely: nothing is simulated, so nothing
+gates, and `swap.simulation` is absent. You are then responsible for whatever
+the transaction does on chain.
 
 ### `sdk.instructions(params): Promise<InstructionsResponse>`
 
@@ -118,8 +143,8 @@ Every error extends `VulcxError`.
 
 ```typescript
 import {
-  VulcxSDK, NoRouteError, RateLimitError, AuthError,
-  QuoteExpiredError, QuoteStaleError,
+  VulcxSDK, VulcxError, NoRouteError, RateLimitError, AuthError,
+  BadRequestError, QuoteExpiredError, QuoteStaleError,
 } from "@vulcx/sdk";
 
 try {
@@ -133,8 +158,29 @@ try {
 }
 ```
 
-`QuoteExpiredError` and `QuoteStaleError` only appear when redeeming a `quoteId`.
-Both mean the same recovery: fetch a fresh quote and retry.
+`QuoteExpiredError` (410) only appears when redeeming a `quoteId`.
+`QuoteStaleError` (409) has two causes: a redeemed route that drifted past the
+firm margin, and a plain `swap()`/`instructions()` call — no `quoteId` involved —
+whose simulation failed on slippage. Both mean the same recovery: fetch a fresh
+quote and retry.
+
+**Quotes expire in about three seconds** (`validForMs`), and the firm window
+(`firmForMs`) is roughly 400 ms. Both are measured from when the quote was
+minted, not from when you send it, so do not hold a `quoteId` across a user
+interaction — a wallet popup will outlive it and `swap()` throws
+`QuoteExpiredError`. Either build on the same tick you quote, re-quote when the
+user clicks, or omit `quoteId` entirely and let the server re-quote at build
+time under your `slippageBps`. The firm window is only reachable from machine
+flows: session-key signing, bots, keepers.
+
+Note also that this SDK retries 429s and 5xx with a one-second first backoff,
+which on its own already exceeds `firmForMs` — so a firm redemption that hits
+one transient 429 is guaranteed to land outside its window. `retries` is set
+per client, not per call, so use a second instance for firm flows:
+
+```typescript
+const firm = new VulcxSDK({ apiKey: process.env.VULCX_KEY, retries: 0 });
+```
 
 ## React
 

@@ -1,6 +1,6 @@
 {
   "name": "@vulcx/sdk",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "TypeScript client for Vulcx, the best-price swap router for Fogo \u2014 multi-hop split routing, firm quotes, and ready-to-sign transactions.",
   "main": "dist/index.cjs",
   "module": "dist/index.esm.js",
@@ -46,5 +46,11 @@
     "defi",
     "firm-quotes",
     "valiant"
-  ]
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }
