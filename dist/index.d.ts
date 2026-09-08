@@ -252,6 +252,18 @@ declare class VulcxSDK {
 declare class VulcxError extends Error {
     readonly statusCode: number;
     readonly body?: unknown | undefined;
+    /**
+     * The API's stable reason code, e.g. `NO_ROUTE`, `SIM_SLIPPAGE`,
+     * `FEE_CAP_EXCEEDED`. **This is the thing to branch on.**
+     *
+     * `message` is prose and the server may reword it at any time; `code` is a
+     * contract and is never renamed or reused once shipped. New codes get added,
+     * so treat one you do not recognise as its HTTP status class.
+     *
+     * `undefined` when the server predates codes, or on a transport failure with
+     * no response body.
+     */
+    readonly code?: string;
     constructor(message: string, statusCode: number, body?: unknown | undefined);
 }
 declare class RateLimitError extends VulcxError {

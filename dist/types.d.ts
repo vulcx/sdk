@@ -237,5 +237,11 @@ export interface InstructionsResponse {
     requiredTokenAccounts?: string[];
 }
 export interface APIErrorBody {
+    /** The human sentence. Prose — the server may reword it. Do not match on it. */
     error: string;
+    /**
+     * The stable reason code (`NO_ROUTE`, `SIM_SLIPPAGE`, …), surfaced on
+     * VulcxError.code. Absent on a server that predates codes.
+     */
+    code?: string;
 }

@@ -1,4 +1,17 @@
 export class VulcxError extends Error {
+  /**
+   * The API's stable reason code, e.g. `NO_ROUTE`, `SIM_SLIPPAGE`,
+   * `FEE_CAP_EXCEEDED`. **This is the thing to branch on.**
+   *
+   * `message` is prose and the server may reword it at any time; `code` is a
+   * contract and is never renamed or reused once shipped. New codes get added,
+   * so treat one you do not recognise as its HTTP status class.
+   *
+   * `undefined` when the server predates codes, or on a transport failure with
+   * no response body.
+   */
+  public readonly code?: string;
+
   constructor(
     message: string,
     public readonly statusCode: number,
@@ -6,6 +19,8 @@ export class VulcxError extends Error {
   ) {
     super(message);
     this.name = "VulcxError";
+    const c = (body as { code?: unknown } | undefined)?.code;
+    if (typeof c === "string" && c.length > 0) this.code = c;
   }
 }
 

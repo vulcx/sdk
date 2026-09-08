@@ -6,6 +6,9 @@ class VulcxError extends Error {
         this.statusCode = statusCode;
         this.body = body;
         this.name = "VulcxError";
+        const c = body?.code;
+        if (typeof c === "string" && c.length > 0)
+            this.code = c;
     }
 }
 class RateLimitError extends VulcxError {
