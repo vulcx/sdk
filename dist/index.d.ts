@@ -20,12 +20,40 @@ interface QuoteRequest {
     swapMode: SwapMode;
     slippageBps?: number;
 }
+/**
+ * One pool hop inside a multi-hop split leg — see `RouteInfo.hops`.
+ *
+ * It carries no `percent`: the percentage belongs to the leg, not to the hops
+ * inside it.
+ */
+interface RouteHopInfo {
+    poolAddress: string;
+    /** Wire value. `Vortex` is the venue Valiant; `Flux` is Fluxbeam. */
+    poolType: string;
+    inputMint: string;
+    outputMint: string;
+}
+/**
+ * One leg of the route — one entry per PARALLEL leg, not per hop.
+ *
+ * `percent` is a property of the leg, so `routes[].percent` sums to 100 across
+ * the array. A leg that is itself multi-hop reports its pools in `hops`; its
+ * own `poolAddress`/`poolType` then describe the first hop only, and
+ * `inputMint`/`outputMint` span the whole leg.
+ */
 interface RouteInfo {
     poolAddress: string;
     poolType: string;
     percent: number;
     inputMint: string;
     outputMint: string;
+    /**
+     * Per-pool breakdown, present only when this leg routes through more than
+     * one pool. Absent for the common single-hop leg, where `poolAddress` and
+     * `poolType` already describe it fully — so do not treat an absent `hops` as
+     * an error, and do not count it for `hopCount`.
+     */
+    hops?: RouteHopInfo[];
 }
 interface QuoteResponse {
     inputMint: string;
@@ -41,6 +69,41 @@ interface QuoteResponse {
     routePath: string[];
     hopCount: number;
     otherAmountThreshold: string;
+    /**
+     * True when the trade was split across parallel legs. **Absent, not `false`,
+     * on the ordinary single-leg quote** — the server omits it when unset, so
+     * read it as `quote.isSplitRoute === true`.
+     */
+    isSplitRoute?: boolean;
+    /**
+     * Percentages across the parallel legs, summing to 100 — one byte per leg,
+     * in the same order as `routes`.
+     *
+     * **It arrives base64-encoded, not as a JSON array.** The server serialises
+     * it from a Go byte slice, so a 92/8 split is the string `"XAg="`. Decode
+     * before use:
+     *
+     * ```ts
+     * const pct = Array.from(
+     *   typeof Buffer !== "undefined"
+     *     ? Buffer.from(splitPercents, "base64")
+     *     : Uint8Array.from(atob(splitPercents), (c) => c.charCodeAt(0)),
+     * );
+     * ```
+     *
+     * `routes[].percent` carries the same numbers already decoded, so prefer
+     * that unless you specifically need this field. Absent unless
+     * `isSplitRoute` is true.
+     *
+     * Established from the serialisation, not from a captured response: the
+     * server field is `[]uint8`, which is Go's `[]byte`, and `encoding/json`
+     * base64-encodes those. Marshalling the real struct with a 92/8 split emits
+     * `{"splitPercents":"XAg="}`. FOGO/USDC would not split at any size on
+     * 2026-09-08 — one pool holds the pair — so no live split was available to
+     * photograph. The previous `number[]` typing was wrong either way: `.map()`
+     * over it walks the characters of a base64 string.
+     */
+    splitPercents?: string;
     /**
      * Firm-quote commitment ID. Pass it as `quoteId` to swap() or
      * instructions() within `validForMs` to have this exact route replayed at
@@ -80,8 +143,10 @@ interface QuoteResponse {
      * response is otherwise identical to a fresh one. This field is the
      * difference. Treat a value materially above a second or two as a reason to
      * distrust the price, not merely to log it.
+     *
+     * Always present — the server does not omit it at zero.
      */
-    dataAgeMs?: number;
+    dataAgeMs: number;
 }
 interface SwapRequest {
     userWallet: string;
@@ -148,26 +213,68 @@ interface SwapResponse {
     /**
      * The DEX pool trading fee across every hop — the LP fee the pools take,
      * NOT Vulcx's. Vulcx's own cut is platformFeeAmount.
+     *
+     * **Denominated in the INPUT token: it is `feeBps` of `amountIn`.** Never
+     * subtract it from `amountOut` — the two are in different units and the
+     * result is meaningless. Measured on production 2026-09-08, 1 FOGO → USDC at
+     * 30 bps: `amountOut` 7054 (USDC base units), `feeAmount` 3000000 (FOGO base
+     * units, 30 bps of 1000000000) — 425x the entire output.
+     *
+     * What the user receives is `amountOut - platformFeeAmount -
+     * integratorFeeAmount`, and only those two.
      */
     feeAmount: string;
     /** Vulcx's fee rate in bps: the global protocol rate, or your negotiated override. */
     platformFeeBps: number;
-    /** platformFeeBps applied to amountOut, in output token units. */
+    /**
+     * platformFeeBps applied to amountOut, in OUTPUT token units, deducted from
+     * amountOut on chain. Unlike feeAmount, this one really is output-side.
+     */
     platformFeeAmount: string;
     /**
      * Your fee rate in bps — yours in full, not a share of platformFeeBps.
      * Echoes what you requested, so you can reconcile against what was charged.
      */
     integratorFeeBps: number;
-    /** integratorFeeBps applied to amountOut, paid on-chain to `referrer`. */
+    /**
+     * integratorFeeBps applied to amountOut, in OUTPUT token units, paid on-chain
+     * to `referrer`. Output-side, like platformFeeAmount and unlike feeAmount.
+     */
     integratorFeeAmount: string;
     simulation?: SimulationResult;
     computeUnitsEstimate: number;
+    /**
+     * The chain slot the pool state behind this build was current to. Omitted
+     * when the engine has no slot yet.
+     */
+    contextSlot?: number;
+    /**
+     * How long ago, in milliseconds, any market-data update last reached the
+     * engine — the same freshness signal as on QuoteResponse, for the build.
+     *
+     * Check it here too. A transaction built off a frozen feed is byte-shaped
+     * like one built off a live feed, and `skipSimulation: true` removes the only
+     * other thing that would have caught it. Always present; the server does not
+     * omit it at zero.
+     */
+    dataAgeMs: number;
     route: string[];
     hopCount: number;
     pools: string[];
+    /** Always present, `false` included — unlike the quote's, which is omitted. */
     isSplitRoute: boolean;
-    splitPercents?: number[];
+    /**
+     * Base64-encoded byte array of the per-leg percentages — see
+     * `QuoteResponse.splitPercents` for the decode. Absent unless `isSplitRoute`
+     * is true.
+     *
+     * Not observed on the wire: on production 2026-09-08 every pair that quoted
+     * as a split came back from /swap as `isSplitRoute: false` on a single pool,
+     * so the builder collapses splits today. Typed from the handler struct
+     * (`internal/http/swap_handler.go`), whose Go type is byte-for-byte the
+     * quote's.
+     */
+    splitPercents?: string;
 }
 interface InstructionsRequest {
     userWallet: string;
