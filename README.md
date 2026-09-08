@@ -38,13 +38,35 @@ const quote = await vulcx.quote({
 console.log(`Output: ${quote.amountOut}, Impact: ${quote.priceImpactPercent}%`);
 ```
 
-Anonymous callers get a small per-IP budget. A key raises that to the published
-100 cost units/second and is **required** for the WebSocket quote stream. Keys are
-free during beta — [request one](https://vulcx.xyz/api-key/).
+Anonymous callers get a small per-IP budget: **2 requests/second, burst 20**, and
+a `/swap` build costs 5 of those units. A key raises that to the published 100
+cost units/second, and is **required** for the WebSocket quote stream and
+nothing else.
 
 ```typescript
 const vulcx = new VulcxSDK({ apiKey: process.env.VULCX_KEY });
 ```
+
+Keys are free during beta but not self-serve: there is no dashboard, and they
+are issued by hand — [ask for one](https://vulcx.xyz/api-key/), which routes to
+[t.me/vulcxsupport](https://t.me/vulcxsupport).
+
+## Runnable examples
+
+[`examples/`](./examples) has three self-contained programs and a cookbook of
+the same calls as raw `curl`:
+
+- [**node-quote-to-swap**](./examples/node-quote-to-swap) — quote → build →
+  sign → submit → confirm, in one file, with the error handling an integration
+  actually needs. Dry-runs by default.
+- [**browser-wallet**](./examples/browser-wallet) — the browser signing flow.
+  No wallet advertises a Fogo chain, so the wallet **signs only** and the page
+  submits to `mainnet.fogo.io` itself.
+- [**integrator-fee**](./examples/integrator-fee) — charging your own fee, and
+  reconciling what you receive.
+
+[`examples/README.md`](./examples/README.md) is the cookbook: every endpoint as
+`curl`, and the full table of error `code` values with what to do about each.
 
 ## Firm quotes — the price you saw is the price you commit
 
@@ -124,9 +146,10 @@ try {
 ```
 
 The `SimulationResult` rides along on the thrown error's body at
-`data.simulation`, with `insufficientFunds` and `slippageExceeded` set — those
-two booleans are the only stable machine-readable failure signal the API
-offers, so branch on them rather than on message text.
+`data.simulation`, with `insufficientFunds` and `slippageExceeded` set. The
+error's `code` says the same thing more directly — `SIM_INSUFFICIENT` (400),
+`SIM_SLIPPAGE` (409), `SIM_FAILED` (422) — so branch on either, never on
+message text.
 
 `skipSimulation: true` opts out entirely: nothing is simulated, so nothing
 gates, and `swap.simulation` is absent. You are then responsible for whatever
@@ -139,7 +162,33 @@ transaction of your own — adding a memo, creating accounts, batching.
 
 ## Errors
 
-Every error extends `VulcxError`.
+Every error extends `VulcxError`, which carries `statusCode` and — the thing to
+branch on — `code`, the API's stable reason string:
+
+```typescript
+catch (err) {
+  if (err instanceof VulcxError) {
+    switch (err.code) {
+      case "SIM_INSUFFICIENT": /* wallet is short; retrying changes nothing */ break;
+      case "SIM_SLIPPAGE":
+      case "QUOTE_STALE":      /* the price moved; re-quote and retry */       break;
+      case "POOL_DATA_MISSING":/* engine still loading; retry shortly */       break;
+      default:                 /* fall back to err.statusCode */               break;
+    }
+  }
+}
+```
+
+`code` is never renamed or reused once shipped; `message` is prose the server
+may reword, so do not match on it. New codes get added — treat one you do not
+recognise as its HTTP status class. It is `undefined` on a transport failure
+with no response body. The full table is in
+[the cookbook](./examples/README.md#error-codes).
+
+The typed classes below cover a status each, which is enough when a status has
+only one meaning. Several do not: `409` is both `QUOTE_STALE` and
+`SIM_SLIPPAGE`, `404` is `NO_POOL`, `NO_ROUTE` or `POOL_DATA_MISSING`. That is
+what `code` is for.
 
 ```typescript
 import {
@@ -208,13 +257,16 @@ function SwapPage() {
 }
 ```
 
-A browser-visible key is readable by anyone using the page. Provision a separate key
-for client-side use and rotate it if it leaks.
+A browser-visible key is readable by anyone using the page. Ask for an
+**origin-locked** key for client-side use: the edge enforces the allowlist on
+both the REST chain and the `/stream` handshake, which is the only thing making
+a public key safe. An unlocked key in page source is a key you have given away.
 
 ## Links
 
+- [Examples and cookbook](./examples) — start here
 - [Docs](https://docs.vulcx.xyz) · [SDK reference](https://docs.vulcx.xyz/sdk/quickstart)
-- [Get an API key](https://vulcx.xyz/api-key/) — free during beta
+- [Ask for an API key](https://vulcx.xyz/api-key/) — free during beta, issued by hand
 - [Status](https://vulcx.xyz/status/)
 
 MIT

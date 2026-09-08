@@ -1,0 +1,27 @@
+{
+  // Typechecks the examples against the SDK source in this repo, so a breaking
+  // change to types.ts fails here instead of shipping an example that no longer
+  // compiles. The `paths` entry is the only thing an integrator does not have:
+  // they `npm install @vulcx/sdk` and the same import resolves to the package.
+  //
+  // Standalone rather than extending ../tsconfig.json: that one sets
+  // declarationDir for the build, which tsc rejects alongside declaration:false.
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2020", "DOM"],
+    "types": ["node"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@vulcx/sdk": ["../src/index.ts"]
+    }
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["**/node_modules"]
+}

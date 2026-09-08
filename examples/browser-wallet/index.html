@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vulcx browser swap example</title>
+  <style>
+    body { font: 14px/1.6 ui-sans-serif, system-ui, sans-serif; max-width: 44rem;
+           margin: 3rem auto; padding: 0 1.25rem; color: #1a1a1a; }
+    h1 { font-size: 1.25rem; }
+    button { font: inherit; padding: .45rem .9rem; margin: 0 .4rem .4rem 0;
+             border: 1px solid #999; border-radius: 6px; background: #fff; cursor: pointer; }
+    button:disabled { opacity: .45; cursor: default; }
+    #status { margin-top: 1.25rem; padding: .75rem 1rem; background: #f4f4f4;
+              border-radius: 6px; word-break: break-all; min-height: 1.6em; }
+    code { background: #f0f0f0; padding: .1em .35em; border-radius: 3px; }
+    p.note { color: #555; }
+  </style>
+</head>
+<body>
+  <h1>Vulcx — swap 1 FOGO for USDC</h1>
+
+  <p class="note">
+    The wallet <strong>signs only</strong>; this page submits to
+    <code>https://mainnet.fogo.io</code> itself. No wallet advertises a Fogo
+    chain, so asking one to <em>send</em> would put the transaction on Solana.
+  </p>
+
+  <div id="wallets"></div>
+
+  <p>
+    <button id="quote">Get a quote</button>
+    <button id="swap" disabled>Swap</button>
+  </p>
+
+  <div id="status">Ready.</div>
+
+  <p class="note">
+    Runs keyless on the anonymous tier (2 rps, burst 20; a build costs 5 units).
+    See <a href="./README.md">README.md</a>.
+  </p>
+
+  <script src="./swap.js"></script>
+</body>
+</html>
