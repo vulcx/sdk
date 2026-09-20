@@ -58,6 +58,11 @@ interface RouteInfo {
 interface QuoteResponse {
     inputMint: string;
     outputMint: string;
+    /**
+     * The amount actually routed. On a size the pools cannot absorb this comes
+     * back **smaller than the `amount` you asked for** — a partial fill. Compare
+     * the two before building, and show the difference to whoever is trading.
+     */
     amountIn: string;
     amountOut: string;
     priceImpactBps: number;
@@ -342,6 +347,19 @@ interface InstructionsResponse {
      * ATA hold amountIn) before the session transaction is sent.
      */
     requiredTokenAccounts?: string[];
+    /** Slot the pool state behind this build was read at. */
+    contextSlot?: number;
+    /** How old that pool state was when the route was priced, in milliseconds. */
+    dataAgeMs?: number;
+}
+interface APIErrorBody {
+    /** The human sentence. Prose — the server may reword it. Do not match on it. */
+    error: string;
+    /**
+     * The stable reason code (`NO_ROUTE`, `SIM_SLIPPAGE`, …), surfaced on
+     * VulcxError.code. Absent on a server that predates codes.
+     */
+    code?: string;
 }
 
 declare class VulcxSDK {
@@ -398,4 +416,4 @@ declare class QuoteStaleError extends VulcxError {
 }
 
 export { AuthError, BadRequestError, NoRouteError, QuoteExpiredError, QuoteStaleError, RateLimitError, ServerError, VulcxError, VulcxSDK };
-export type { InstructionsRequest, InstructionsResponse, PriceImpactSeverity, QuoteRequest, QuoteResponse, RawAccountMeta, RawInstruction, RouteInfo, SDKConfig, SimulationResult, SwapMode, SwapRequest, SwapResponse };
+export type { APIErrorBody, InstructionsRequest, InstructionsResponse, PriceImpactSeverity, QuoteRequest, QuoteResponse, RawAccountMeta, RawInstruction, RouteInfo, SDKConfig, SimulationResult, SwapMode, SwapRequest, SwapResponse };

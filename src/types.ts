@@ -68,6 +68,11 @@ export interface RouteInfo {
 export interface QuoteResponse {
   inputMint: string;
   outputMint: string;
+  /**
+   * The amount actually routed. On a size the pools cannot absorb this comes
+   * back **smaller than the `amount` you asked for** — a partial fill. Compare
+   * the two before building, and show the difference to whoever is trading.
+   */
   amountIn: string;
   amountOut: string;
   priceImpactBps: number;
@@ -359,6 +364,10 @@ export interface InstructionsResponse {
    * ATA hold amountIn) before the session transaction is sent.
    */
   requiredTokenAccounts?: string[];
+  /** Slot the pool state behind this build was read at. */
+  contextSlot?: number;
+  /** How old that pool state was when the route was priced, in milliseconds. */
+  dataAgeMs?: number;
 }
 
 export interface APIErrorBody {

@@ -24,10 +24,12 @@ amount=1000000000&swapMode=ExactIn&slippageBps=50"
 
 **An API key is not required.** Keyless requests are served on an anonymous
 per-IP tier: **2 requests/second, burst 20**. A key raises you to the published
-per-key budget (100 cost units/second, burst 200). One endpoint is different:
+budget of your plan (20 cost units/second on the free plan, burst 40, and up
+to 2000/4000 on Pro). One endpoint is different:
 
-> `/api/v1/stream` (the WebSocket) **always** requires a key — a long-lived
-> connection does not fit the per-request limiter model.
+> `/api/v1/stream` (the WebSocket) **always** requires a key, on a plan that
+> includes stream connections — a long-lived connection does not fit the
+> per-request limiter model.
 
 Requests are debited by what they cost the engine, not by how many you made:
 
@@ -46,10 +48,11 @@ Send a key as a bearer token:
 curl -H "Authorization: Bearer $VULCX_KEY" "https://api.vulcx.xyz/api/v1/quote?..."
 ```
 
-**There is no dashboard and no self-serve signup.** During beta keys are issued
-by hand — ask on [t.me/vulcxsupport](https://t.me/vulcxsupport). Keys can be
-origin-locked, which is the only thing that makes a key in browser source safe;
-ask for that if the key will ship in a page.
+**Keys are self-serve**: sign in at [portal.vulcx.xyz](https://portal.vulcx.xyz)
+with Google or GitHub. Keys can be origin-locked, which is the only thing that
+makes a key in browser source safe; ask on
+[t.me/vulcxsupport](https://t.me/vulcxsupport) for that if the key will ship in
+a page.
 
 `/health`, `/metrics` and `/api/v1/tokens` sit outside the auth chain entirely.
 

@@ -40,8 +40,8 @@ a few quotes fits.
 If you set a key: **it ships in page source and is world-readable.** Only ever
 put an origin-locked key here — the edge enforces the allowlist on both the REST
 chain and the `/stream` handshake, which is the only thing making a public key
-safe. Keys are issued by hand during beta via
-[t.me/vulcxsupport](https://t.me/vulcxsupport); there is no dashboard.
+safe. Create a key at [portal.vulcx.xyz](https://portal.vulcx.xyz); ask on
+[t.me/vulcxsupport](https://t.me/vulcxsupport) to have it origin-locked.
 
 Keyless also means every visitor behind a shared egress IP contends for one
 bucket. An origin-locked key is the real fix for a production page.

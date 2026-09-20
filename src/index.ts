@@ -1,5 +1,6 @@
 export { VulcxSDK } from "./client";
 export type {
+  APIErrorBody,
   SDKConfig,
   SwapMode,
   PriceImpactSeverity,

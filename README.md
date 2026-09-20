@@ -39,17 +39,19 @@ console.log(`Output: ${quote.amountOut}, Impact: ${quote.priceImpactPercent}%`);
 ```
 
 Anonymous callers get a small per-IP budget: **2 requests/second, burst 20**, and
-a `/swap` build costs 5 of those units. A key raises that to the published 100
-cost units/second, and is **required** for the WebSocket quote stream and
-nothing else.
+a `/swap` build costs 5 of those units. A key raises that to your plan's
+budget — 20 cost units/second on the free plan, up to 2000 on Pro — and is
+**required** for the WebSocket quote stream, which also needs a plan that
+includes stream connections.
 
 ```typescript
 const vulcx = new VulcxSDK({ apiKey: process.env.VULCX_KEY });
 ```
 
-Keys are free during beta but not self-serve: there is no dashboard, and they
-are issued by hand — [ask for one](https://vulcx.xyz/api-key/), which routes to
-[t.me/vulcxsupport](https://t.me/vulcxsupport).
+Keys are self-serve and the free plan costs nothing: sign in at
+[portal.vulcx.xyz](https://portal.vulcx.xyz) with Google or GitHub and create
+one. The portal is also where a key's default integrator fee and the wallet
+that fee pays live.
 
 ## Runnable examples
 
@@ -266,7 +268,7 @@ a public key safe. An unlocked key in page source is a key you have given away.
 
 - [Examples and cookbook](./examples) — start here
 - [Docs](https://docs.vulcx.xyz) · [SDK reference](https://docs.vulcx.xyz/sdk/quickstart)
-- [Ask for an API key](https://vulcx.xyz/api-key/) — free during beta, issued by hand
+- [Get an API key](https://portal.vulcx.xyz) — self-serve, free plan available
 - [Status](https://vulcx.xyz/status/)
 
 MIT
