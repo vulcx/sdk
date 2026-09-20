@@ -28,9 +28,9 @@ import { VulcxSDK } from "@vulcx/sdk";
 const vulcx = new VulcxSDK();
 
 const quote = await vulcx.quote({
-  inputMint: "So11111111111111111111111111111111111111112", // FOGO
-  outputMint: "uSd2czE61Evaf76RNbq4KPpXnkiL3irdzgLFUMe3NoG", // USDC on Fogo
-  amount: "1000000000", // 1 FOGO (9 decimals)
+  inputMint: "uSd2czE61Evaf76RNbq4KPpXnkiL3irdzgLFUMe3NoG", // USDC.s
+  outputMint: "So11111111111111111111111111111111111111112", // FOGO
+  amount: "10000000", // 10 USDC.s (6 decimals)
   swapMode: "ExactIn",
   slippageBps: 50,
 });
@@ -120,9 +120,9 @@ A base64 unsigned transaction, plus `lastValidBlockHeight` and a `simulation` re
 ```typescript
 const swap = await vulcx.swap({
   userWallet: "9WzDX...",
-  inputMint: "So11111111111111111111111111111111111111112",
-  outputMint: "uSd2czE61Evaf76RNbq4KPpXnkiL3irdzgLFUMe3NoG",
-  amount: "1000000000",
+  inputMint: "uSd2czE61Evaf76RNbq4KPpXnkiL3irdzgLFUMe3NoG",
+  outputMint: "So11111111111111111111111111111111111111112",
+  amount: "10000000",
   swapMode: "ExactIn",
   slippageBps: 50,
 });
@@ -247,9 +247,9 @@ function SwapPage() {
   useEffect(() => {
     sdk
       .quote({
-        inputMint: "So11111111111111111111111111111111111111112",
-        outputMint: "uSd2czE61Evaf76RNbq4KPpXnkiL3irdzgLFUMe3NoG",
-        amount: "1000000000",
+        inputMint: "uSd2czE61Evaf76RNbq4KPpXnkiL3irdzgLFUMe3NoG",
+        outputMint: "So11111111111111111111111111111111111111112",
+        amount: "10000000",
         swapMode: "ExactIn",
       })
       .then(setQuote);
