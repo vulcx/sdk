@@ -149,14 +149,12 @@ export class VulcxSDK {
             throw new VulcxError(errMsg, res.status, errBody);
         }
       } catch (err) {
-        if (
-          err instanceof AuthError ||
-          err instanceof BadRequestError ||
-          err instanceof NoRouteError ||
-          err instanceof VulcxError
-        ) {
-          throw err;
-        }
+        // Anything typed is a verdict the server already gave us -- retrying
+        // it cannot change the answer, so it leaves the loop. 429 and 5xx never
+        // reach here: they are assigned to lastError and `continue` instead.
+        // (AuthError, BadRequestError and NoRouteError all extend VulcxError,
+        // so naming them separately tested the same thing four times.)
+        if (err instanceof VulcxError) throw err;
         lastError = err as Error;
       }
     }
